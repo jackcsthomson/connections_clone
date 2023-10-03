@@ -304,7 +304,9 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(width: spacer),
               OutlinedButton(
                 onPressed: () {
-                  _onSubmit();
+                  if (isSelected.length == 4) {
+                    _onSubmit();
+                  }
                 },
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
