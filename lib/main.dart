@@ -1,4 +1,25 @@
+import 'dart:ui' as ui;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+//* * Set Groupings and Hint Text
+List green = ['CLOCK', 'MAIL', 'MAPS', 'NOTES'];
+List yellow = ['BOW', 'KNEEL', 'SALUTE', 'STAND'];
+List blue = ['DOWN', 'FUR', 'SCALES', 'SHELL'];
+List purple = ['ARROW', 'DOG', 'FINGER', 'HINT'];
+
+String greenAnswer = 'IPHONE APPS';
+String yellowAnswer = 'WAYS TO SHOW RESPECT';
+String blueAnswer = 'ANIMAL COVERINGS';
+String purpleAnswer = '"POINTERS"';
+
+Color greenColor = const Color(0xFFA0C35A);
+Color yellowColor = const Color(0xFFF9DF6D);
+Color blueColor = const Color(0xFFB0C4EF);
+Color purpleColor = const Color(0xFFBA81C5);
+Color selected = const Color(0XFF5A594E);
+Color itemGrey = const Color(0xFFEFEFE6);
 
 void main() {
   runApp(const MyApp());
@@ -7,119 +28,302 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    var orientation = MediaQuery.of(context).orientation;
+
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'NYT Connections',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        fontFamily: 'Libre Franklin',
+        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
         useMaterial3: true,
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            foregroundColor: Colors.black,
+            backgroundColor: itemGrey,
+            minimumSize: orientation == Orientation.portrait
+                ? ui.Size(width / 4.75, height / 10)
+                : ui.Size(width / 10, height / 10),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.black,
+            side: const BorderSide(
+              color: Colors.black,
+              style: BorderStyle.solid,
+            ),
+          ),
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List words = green + yellow + blue + purple;
+  List isSelected = [];
+  int mistakes = 0;
+  List correctGroups = [];
+  List correctWords = [];
+  bool appLaunch = true;
 
-  void _incrementCounter() {
+  void _wordButtonPress(String word) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      if (((isSelected.contains(word)) || (isSelected.length != 4)) &&
+          (mistakes != 4) &&
+          !(correctWords.contains(word))) {
+        if (isSelected.contains(word)) {
+          isSelected.remove(word);
+        } else {
+          isSelected.add(word);
+        }
+      }
     });
+  }
+
+  void _onSubmit() {
+    setState(() {
+      isSelected.sort();
+      if (listEquals(isSelected, green)) {
+        correctGroups.add('GREEN');
+        correctWords.add(green[0]);
+        correctWords.add(green[1]);
+        correctWords.add(green[2]);
+        correctWords.add(green[3]);
+      } else if (listEquals(isSelected, yellow)) {
+        correctGroups.add('YELLOW');
+        correctWords.add(yellow[0]);
+        correctWords.add(yellow[1]);
+        correctWords.add(yellow[2]);
+        correctWords.add(yellow[3]);
+      } else if (listEquals(isSelected, blue)) {
+        correctGroups.add('BLUE');
+        correctWords.add(blue[0]);
+        correctWords.add(blue[1]);
+        correctWords.add(blue[2]);
+        correctWords.add(blue[3]);
+      } else if (listEquals(isSelected, purple)) {
+        correctGroups.add('PURPLE');
+        correctWords.add(purple[0]);
+        correctWords.add(purple[1]);
+        correctWords.add(purple[2]);
+        correctWords.add(purple[3]);
+      } else {
+        mistakes++;
+      }
+      isSelected = [];
+    });
+  }
+
+  correctColour(String word) {
+    if (green.contains(word)) {
+      return greenColor;
+    } else if (yellow.contains(word)) {
+      return yellowColor;
+    } else if (blue.contains(word)) {
+      return blueColor;
+    } else if (purple.contains(word)) {
+      return purpleColor;
+    }
+  }
+
+  Widget wordButton(String word, Orientation orientation) {
+    return FilledButton(
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        backgroundColor: correctWords.contains(word)
+            ? correctColour(word)
+            : isSelected.contains(word)
+                ? selected
+                : itemGrey,
+      ),
+      onPressed: () {
+        _wordButtonPress(word);
+      },
+      child: Text(
+        word,
+        style: TextStyle(
+          fontSize: orientation == Orientation.portrait ? 12 : 16,
+          fontWeight: FontWeight.w900,
+          color: isSelected.contains(word) ? Colors.white : Colors.black,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    var orientation = MediaQuery.of(context).orientation;
+    double spacer = orientation == Orientation.portrait ? 5 : 10;
+    double fontSize = orientation == Orientation.portrait ? 12 : 16;
+    if (appLaunch) {
+      words.shuffle();
+      appLaunch = false;
+    }
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: spacer),
+          Text(
+            'Create four groups of four!',
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w900,
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+          ),
+          SizedBox(height: spacer),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              wordButton(words[0], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[1], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[2], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[3], orientation),
+            ],
+          ),
+          SizedBox(height: spacer),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              wordButton(words[4], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[5], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[6], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[7], orientation),
+            ],
+          ),
+          SizedBox(height: spacer),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              wordButton(words[8], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[9], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[10], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[11], orientation),
+            ],
+          ),
+          SizedBox(height: spacer),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              wordButton(words[12], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[13], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[14], orientation),
+              SizedBox(width: spacer),
+              wordButton(words[15], orientation),
+            ],
+          ),
+          SizedBox(height: spacer * 2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Mistakes Remaining:',
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              for (int i = 0; i < 4 - mistakes; i++)
+                Row(
+                  children: [
+                    const SizedBox(width: 4),
+                    Icon(Icons.circle, size: 14, color: selected),
+                  ],
+                ),
+            ],
+          ),
+          SizedBox(height: spacer * 2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              OutlinedButton(
+                onPressed: () {
+                  setState(
+                    () {
+                      words.shuffle();
+                    },
+                  );
+                },
+                child: Text(
+                  'Shuffle',
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              SizedBox(width: spacer),
+              OutlinedButton(
+                  onPressed: () {
+                    setState(
+                      () {
+                        isSelected = [];
+                      },
+                    );
+                  },
+                  child: Text(
+                    'Deselect All',
+                    style: TextStyle(
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  )),
+              SizedBox(width: spacer),
+              OutlinedButton(
+                onPressed: () {
+                  _onSubmit();
+                },
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: isSelected.length == 4 ? Colors.black : itemGrey,
+                  ),
+                ),
+                child: Text(
+                  'Submit',
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w500,
+                    color: isSelected.length == 4 ? Colors.black : itemGrey,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

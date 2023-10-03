@@ -88,3 +88,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+fonts:
+    - family: Libre Franklin
+      fonts:
+        - asset: fonts/LibreFranklin-Light.ttf
+        - asset: fonts/LibreFranklin-Medium.ttf
